@@ -154,10 +154,7 @@ class App extends Component{
             padding: '8px',
             width: '20%',
             margin: '0 auto',
-            cursor: 'pointer',
-            ":hover": {
-                backgroundColor: 'lightgreen'
-            }
+            cursor: 'pointer'
         }
         let person = null
         if (this.state.showPersons) {
@@ -170,9 +167,6 @@ class App extends Component{
                             changed = {(event) =>{this.changeTextHandler(event,person.id)}}/>
             })
             style.backgroundColor = "red"
-            style[":hover"] = {
-                backgroundColor: "salmon"
-            }
         }
         let character = this.state.charComponent.map((characterVal,characterIndex)=>{
             return <CharComponent character={characterVal}
@@ -224,4 +218,4 @@ class App extends Component{
     }
 }
 
-export default Radium(App);     //High order Component
+export default App;     //High order Component

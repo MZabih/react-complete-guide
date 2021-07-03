@@ -1,11 +1,12 @@
 import React, {Component} from 'react'
-import './App.css';
-import Person from './Person/Person'
-import UserInput from './User/UserInput'
+import styles from './App.css';
+import Persons from '../components/Persons/Persons'
+import UserInput from '../components/User/UserInput'
+import Cockpit from '../components/Cockpit/Cockpit'
 // import UserOutput from './User/UserOutput'
-import Radium, {StyleRoot} from 'radium'
-import ValidationComponent from './Components/ValidationComponent'
-import CharComponent from './Components/CharComponent'
+import Radium, {StyleRoot} from 'radium' //Radium is used to apply our css properties like hover, mediaqueries in our inline-stylings
+import ValidationComponent from '../components/Validation/ValidationComponent'
+import CharComponent from '../components/AddCharacterComponent/CharComponent'
 
 // const App = (props) => {
 //     const[personState,setPersonState] = useState({
@@ -65,6 +66,7 @@ class App extends Component{
         charValue: '',
         newCharValue:'',
         showPersons: false,
+        showCockpit: true,
         userInput: ''
     }
 
@@ -134,8 +136,6 @@ class App extends Component{
             charComponent: [...this.state.charComponent,character],
             newCharValue: ''
         })
-        // console.log('this.state.charComponent.length: ', this.state.charComponent.length)
-        // console.log('this.state.newCharValue: ', this.state.newCharValue)
         console.log('character: ', character)
     }
 
@@ -158,15 +158,11 @@ class App extends Component{
         }
         let person = null
         if (this.state.showPersons) {
-            person = this.state.persons.map((person,personIndex) => {
-                    return <Person
-                            name = {person.name}
-                            age = {person.age}
-                            click = {()=> {this.deletePersonHandler(personIndex)}}
-                            key = {person.id}
-                            changed = {(event) =>{this.changeTextHandler(event,person.id)}}/>
-            })
-            style.backgroundColor = "red"
+            person = <Persons
+                        persons = {this.state.persons}
+                        clicked = {this.deletePersonHandler}
+                        changed = {this.changeTextHandler}
+                    />;
         }
         let character = this.state.charComponent.map((characterVal,characterIndex)=>{
             return <CharComponent character={characterVal}
@@ -180,23 +176,27 @@ class App extends Component{
                     click = {() => this.deleteCharacter(index)}/>
         })
         let userNameLength = this.state.userName.length
-        const classes = []
-        if (this.state.persons.length <=2){
-            classes.push("Red")
-        }
-        if (this.state.persons.length <=1){
-            classes.push("Bold")
-        }
         return (
             <StyleRoot>
-                <div className="App">
-                    <h1>I am a react app</h1>
-                    <p className={classes.join(' ')}>This is really working</p>
-                    <button style = {style} onClick={this.togglePersonData}>Toggle Persons</button>
+                <div className = {styles.App}>
+                    <button onClick={() =>{this.setState({
+                        showCockpit: false
+                    })}}>RemoveCockPit</button>
+                    {       this.state.showCockpit? <Cockpit
+                             title = {this.props.title}
+                             showPersons = {this.state.showPersons}
+                             togglePersonData = {this.togglePersonData}
+                             persons = {this.state.persons}
+                    /> : null}
                     {person}
-                    <UserInput name = {this.state.userName} changeUserName={this.changeUserNameHandler}/>
+                    <UserInput
+                        name = {this.state.userName}
+                        changeUserName={this.changeUserNameHandler}
+                    />
                     <p>UserNameLength: {userNameLength}</p>
-                    <ValidationComponent length={userNameLength}/>
+                    <ValidationComponent
+                        length={userNameLength}
+                    />
                     <div style={{background: '#eee', margin: '1% 35% 0'}}>
                         <input placeholder="Enter Text"
                                onChange={this.changeCharValue}

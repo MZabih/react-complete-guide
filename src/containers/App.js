@@ -7,6 +7,9 @@ import Cockpit from '../components/Cockpit/Cockpit'
 import Radium, {StyleRoot} from 'radium' //Radium is used to apply our css properties like hover, mediaqueries in our inline-stylings
 import ValidationComponent from '../components/Validation/ValidationComponent'
 import CharComponent from '../components/AddCharacterComponent/CharComponent'
+import WithClass from '../hoc/WithClass'
+import Aux from '../hoc/Aux'
+import AuthContext from '../context/auth-context'
 
 // const App = (props) => {
 //     const[personState,setPersonState] = useState({
@@ -54,7 +57,10 @@ import CharComponent from '../components/AddCharacterComponent/CharComponent'
 // }
 
 class App extends Component{
-
+    constructor(props) {
+        super(props)
+        this.inputElementRef = React.createRef()
+    }
     state = {
         persons:[
             {id:'Z2M', name: 'Zabih', age: 29},
@@ -67,9 +73,13 @@ class App extends Component{
         newCharValue:'',
         showPersons: false,
         showCockpit: true,
-        userInput: ''
+        userInput: '',
+        changeCounter: 0,
+        authenticate: false
     }
-
+    componentDidMount(){
+        this.inputElementRef.current.focus()
+    }
     buttonSwitchHandler = () => {
         let personsUpdateArray = [...this.state.persons]
         let updatedName = personsUpdateArray.findIndex(person => person.name === 'Zabih')
@@ -85,9 +95,18 @@ class App extends Component{
         })
         const persons1 = [...this.state.persons]
         persons1[selectedPersonIndex].name = event.target.value
-        this.setState({persons:persons1})
+        this.setState((prevState, props) => {
+            return{
+                persons:persons1,
+                changeCounter:prevState.changeCounter+1
+            }
+        })
     }
-
+    authenticate = () => {
+        this.setState({
+            authenticate:true
+        })
+    }
     changeUserNameHandler = (event) => {
         this.setState({
             userName: event.target.value
@@ -162,6 +181,7 @@ class App extends Component{
                         persons = {this.state.persons}
                         clicked = {this.deletePersonHandler}
                         changed = {this.changeTextHandler}
+                        authenticate = {this.state.authenticate}
                     />;
         }
         let character = this.state.charComponent.map((characterVal,characterIndex)=>{
@@ -178,17 +198,19 @@ class App extends Component{
         let userNameLength = this.state.userName.length
         return (
             <StyleRoot>
-                <div className = {styles.App}>
+                <Aux>
                     <button onClick={() =>{this.setState({
                         showCockpit: false
                     })}}>RemoveCockPit</button>
-                    {       this.state.showCockpit? <Cockpit
-                             title = {this.props.title}
-                             showPersons = {this.state.showPersons}
-                             togglePersonData = {this.togglePersonData}
-                             persons = {this.state.persons}
-                    /> : null}
-                    {person}
+                    <AuthContext.Provider value={{authenticate:this.state.authenticate, login: this.authenticate}}>
+                        {       this.state.showCockpit? (<Cockpit
+                                 title = {this.props.title}
+                                 showPersons = {this.state.showPersons}
+                                 togglePersonData = {this.togglePersonData}
+                                 persons = {this.state.persons}
+                        />): null}
+                        {person}
+                    </AuthContext.Provider>
                     <UserInput
                         name = {this.state.userName}
                         changeUserName={this.changeUserNameHandler}
@@ -207,15 +229,16 @@ class App extends Component{
                     <div style={{background: '#eee', margin: '1% 35% 0'}}>
                         <input
                             type = "text"
+                            ref = {this.inputElementRef}
                             onChange={this.onChangeHandler}
                             value={this.state.userInput}
                         />
                         {maxCharacter}
                     </div>
-                </div>
+                </Aux>
             </StyleRoot>
         );
     }
 }
 
-export default App;     //High order Component
+export default WithClass(App,styles.App);     //High order Component

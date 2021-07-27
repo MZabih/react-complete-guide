@@ -1,12 +1,12 @@
-import React, {useEffect} from 'react'
+import React, {useEffect,useRef} from 'react'
 import styles from './Cockpit.css'
-
+import AuthContext from '../../context/auth-context'
 const  Cockpit = (props) => {
+    const toggleButton = useRef(null)
     useEffect(() => {
-        console.log("It is react hook which contains all the functionality of react life cycle hooks, and it will be called after every state update")
-        setTimeout(() => {
-            alert("alert shown after 1 sec through useEffect, whenever our person props changes")
-        },1000)
+        //It is react hook which contains all the functionality of react life cycle hooks,
+        // and it will be called after every state update"
+        toggleButton.current.click()
         return(()=>{console.log('CleanupWork which we usually do in componentWillunmount')})
     },[])
     const classes = []
@@ -24,9 +24,16 @@ const  Cockpit = (props) => {
         <div className={styles.Cockpit}>
             <h1>{props.title}</h1>
             <p className={classes.join(' ')}>This is really working</p>
-            <button className={buttonClass} onClick={props.togglePersonData}>Toggle Persons</button>
+            <button className={buttonClass}
+                    ref = {toggleButton}
+                    onClick={props.togglePersonData}>
+                    Toggle Persons
+            </button>
+            <AuthContext.Consumer>
+                {(context) => <button onClick={context.login}>Login</button>}
+            </AuthContext.Consumer>
         </div>
     )
 }
 
-export default Cockpit;
+export default React.memo(Cockpit);

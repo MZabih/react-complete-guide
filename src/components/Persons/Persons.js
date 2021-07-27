@@ -1,5 +1,7 @@
 import React, {Component} from 'react'
 import Person from './Person/Person'
+import PropTypes from 'prop-types'
+import AuthContext from '../../context/auth-context'
 
 class Persons extends Component{
     /* In shouldComponentUpdate method It will be getting upcoming props and states, Here you have to decide whether you want to
@@ -7,7 +9,9 @@ class Persons extends Component{
 
     shouldComponentUpdate (nextProps,nextState) {
         console.log("ShouldComponentUpdate called from Persons.js")
-        return true
+        if(nextProps !== this.props.persons){
+            return true
+        } else return false
     }
 
     // static getDerivedStateFromProps (props,state) {
@@ -28,16 +32,26 @@ class Persons extends Component{
     }
 
     render() {
-        return this.props.persons.map((person,personIndex) => {
-            return <Person
-                name = {person.name}
-                age = {person.age}
-                click = {()=> {this.props.clicked(personIndex)}}
-                key = {person.id}
-                changed = {(event) =>{this.props.changed(event,person.id)}}
-            />
-        })
+        return this.props.persons.map((person, personIndex) => {
+                return <Person
+                    name={person.name}
+                    age={person.age}
+                    click={() => {
+                        this.props.clicked(personIndex)
+                    }}
+                    key={person.id}
+                    changed={(event) => {
+                        this.props.changed(event, person.id)
+                    }}
+                />
+            })
     }
+}
+Person.propTypes = {
+    click: PropTypes.func,
+    age: PropTypes.number,
+    name: PropTypes.string,
+    changed: PropTypes.func
 }
 
 export default Persons
